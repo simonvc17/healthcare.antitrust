@@ -20,9 +20,10 @@
 #' system-level identifiers. Patients are not allowed to divert to
 #' within-system alternative hospitals.
 #'
-#' For more details see the example vignette:
-#' \href{../doc/semipar_example.html}{\code{vignette("semipar_example", package = "healthcare.antitrust")}}
-#'
+#' For more details see the example vignette by typing:
+#' \code{vignette("semipar_example", package = "healthcare.antitrust")}
+#' Make sure you installed the package including the vignettes:
+#' \code{devtools::install_github("mpanhans/healthcare.antitrust")}
 #' @export
 
 

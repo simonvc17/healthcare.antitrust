@@ -11,6 +11,16 @@
 #'   be ordered in decreasing refinement, so that observations not allocated
 #'   to a cell meeting the minimum size threshold can be allocated by a
 #'   coaser layer.
+#'
+#' @details The output is a list of datasets. The first item in the list
+#' is the original dataset, with observations allocated to cells. The
+#' second item in the list is a dataset of unmatched observations.
+#'
+#' For more details see the example vignette by typing:
+#' \code{vignette("semipar_example", package = "healthcare.antitrust")}
+#' Make sure you installed the package including the vignettes:
+#' \code{devtools::install_github("mpanhans/healthcare.antitrust")}
+#'
 #' @export
 
 # Here could also go Roxygen comments with example tags (or links to
@@ -75,7 +85,7 @@ cell_defn <- function(D, S_min, layers) {
   D0[,cbind("cell1","cell_tot")] <- list(NULL)
 
   # Return List of Outputs
-  newList <- list(D0)
+  newList <- list(D0, DD)
   return(newList)
 }
 

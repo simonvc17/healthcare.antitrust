@@ -22,3 +22,13 @@ coaser layer.}
 Take a dataset of hospital discharges, and allocate them to cells that
 meet a minimum threshold cell size.
 }
+\details{
+The output is a list of datasets. The first item in the list
+is the original dataset, with observations allocated to cells. The
+second item in the list is a dataset of unmatched observations.
+
+For more details see the example vignette by typing:
+\code{vignette("semipar_example", package = "healthcare.antitrust")}
+Make sure you installed the package including the vignettes:
+\code{devtools::install_github("mpanhans/healthcare.antitrust")}
+}
