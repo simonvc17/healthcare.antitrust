@@ -1,0 +1,107 @@
+---
+title: "Semiparametric Estimation with Hospital Discharge Data"
+author: "Matthew T. Panhans"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Semiparametric Estimation with Hospital Discharge Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette shows how to use healthcare.antitrust to implement semiparametric demand estimation of hospital discharge data.
+
+# Cell definitions
+The first step is to assign observations to 'cells' within which the substitution proportional to share is assumed to hold. This can be done with the `cell_defn` function. Begin by loading the example dataset of hospital discharges:
+
+```{r}
+library(healthcare.antitrust)
+data(discharge_data, package = "healthcare.antitrust")
+```
+
+This sample dataset contains hospital discharges, with each observation including a hospital identifier and patient characteristics (DRG diagnosis code, patient age, and patient zip code of residence).
+
+The observations will be grouped into cells based on variables in the dataset. Let's define cells based on three variables: the DRG diagnosis code, the patient age, and the patient zip code of residence.
+
+```{r}
+list1 <- c("drg","age","zip5")
+layers <- list(list1)
+```
+
+A minimum cell size threshold also needs to be set. Let's set the minimum size to 15:
+```{r}
+thrs <- 15
+```
+
+Then use `cell_defn` to allocate observations to cells, based on the variables in the layer. The one required variable is `adm`, which indicates how many admissions are represented by each observation. In this case, each observation is an admission, so we will set adm to 1 for all observations. Then we can run `cell_defn`.
+```{r}
+discharge_data$adm <- 1
+outList <- cell_defn(discharge_data,thrs,layers)
+```
+
+The `cell_defn` function returns a list. The first item in the list is a new dataset that contains the observations that have been allocated to a cell.
+
+```{r}
+D0 <- as.data.frame(outList[1])
+print(nrow(D0))
+print(nrow(discharge_data))
+```
+
+The new dataset has `nrow(D0)` observations. `cell_defn` stated that it excluded some observations, those that were not allocated to a cell that met the minimum size threshold. The number of excluded observations added to the number of observations in the new dataset equals the number of observations in the original dataset. 
+
+We can instead use two layers to define cells. Adding a second, more coarse, layer will allow more observations to be allocated to cells that meet the minimum size threshold. Let's add a layer that uses three digit zip code only. 
+
+```{r}
+discharge_data$zip3 <- floor(discharge_data$zip5/100)
+list1 <- c("drg","age","zip5")
+list2 <- c("zip3")
+layers <- list(list1, list2)
+```
+
+With this new definition of layers, we can allocate observations like before:
+
+```{r}
+outList <- cell_defn(discharge_data,thrs,layers)
+D0 <- as.data.frame(outList[1])
+print(nrow(D0))
+print(nrow(discharge_data))
+```
+
+The observations are first allocated to cells as before, and the remaining observations are allocated to a cell based on three digit zip code only. With these definitions, every observation is allocated to a cell that meets the minimum size threshold that was set.
+
+We are now able to calculate diversion ratios based on the cell definitions.
+
+# Diversion Ratio Calculation
+
+We can calculate diversion ratios with the function `div_calc`. The required variables are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which was also required by `cell_defn`.
+
+Finally, we need to specify a party hospital indicator, `party_ind`, for which diversion ratios will be calculated. Suppose hospitals 1, 2, and 5 are merging.
+
+```{r}
+D0$party_ind <- 0
+D0$party_ind[D0$hosp_id==1] <- 1
+D0$party_ind[D0$hosp_id==2] <- 1
+D0$party_ind[D0$hosp_id==5] <- 1
+```
+
+Now we can calculate diversions using the `div_calc` function.
+
+```{r}
+out <- div_calc(D0)
+```
+
+The function prints the `hosp_id` of each hospital for which diversion is calculated, as well as the total diversion from that hospital. The total diversion should be equal to 1 for each hospital. The resulting matrix shows diversions from each of the merging hospitals to all other hospitals. The diversions should sum to 1. We can verify this is the case for hospital 1:
+
+```{r}
+sum(out$div_from_1, na.rm = TRUE)
+```
+
