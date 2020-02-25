@@ -22,8 +22,6 @@
 #'
 #' For more details see the example vignette by typing:
 #' \code{vignette("semipar_example", package = "healthcare.antitrust")}
-#' Make sure you installed the package including the vignettes:
-#' \code{devtools::install_github("mpanhans/healthcare.antitrust")}
 #' @export
 
 
