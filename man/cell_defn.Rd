@@ -4,13 +4,13 @@
 \alias{cell_defn}
 \title{Allocate Observations to Cells}
 \usage{
-cell_defn(D, S_min, layers)
+cell_defn(D, s_min, layers)
 }
 \arguments{
 \item{D}{Dataset of discharges. The one required variable is adm, which
 indicates how many admissions are represented by the observation.}
 
-\item{S_min}{Minimize cell size.}
+\item{s_min}{Minimize cell size.}
 
 \item{layers}{A list of lists. Each layer is a list of the variables
 on which observations will be allocated to cells. The layers should

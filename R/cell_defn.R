@@ -5,7 +5,7 @@
 #'
 #' @param D Dataset of discharges. The one required variable is adm, which
 #'   indicates how many admissions are represented by the observation.
-#' @param S_min Minimize cell size.
+#' @param s_min Minimize cell size.
 #' @param layers A list of lists. Each layer is a list of the variables
 #'   on which observations will be allocated to cells. The layers should
 #'   be ordered in decreasing refinement, so that observations not allocated
@@ -18,15 +18,13 @@
 #'
 #' For more details see the example vignette by typing:
 #' \code{vignette("semipar_example", package = "healthcare.antitrust")}
-#' Make sure you installed the package including the vignettes:
-#' \code{devtools::install_github("mpanhans/healthcare.antitrust")}
 #'
 #' @export
 
 # Here could also go Roxygen comments with example tags (or links to
 # vignettes) and description of output. With tags @examples and @return.
 
-cell_defn <- function(D, S_min, layers) {
+cell_defn <- function(D, s_min, layers) {
   cc <- c("cell","cell_type")
 
   # Create ID numbers for cells based on layers of decreasing refinement
@@ -41,21 +39,26 @@ cell_defn <- function(D, S_min, layers) {
   }
 
   # Starting with the most refined layer, merge with discharge data.
-  # Use this cell defn for cells with at least `thrs' events.
-  # For cells with fewer than `thrs', go on to next level.
+  # Use this cell defn for cells with at least `s_min' events.
+  # For cells with fewer than `s_min', go on to next level.
+
+  cell1<-cell_def[[1]]; list1<-layers[[1]]
 
   # First Layer
-  DD <- merge(D,cell_def[[1]],by=(list1))
+  DD <- merge(D,cell1,by=(list1))
   tmp <- aggregate(DD$adm,by=list(DD$cell,DD$cell_type),sum)
   names(tmp) <- c(cc,"cell_tot")
   DD <- merge(DD,tmp,by=cc)
-  D0 <- subset(DD,cell_tot >= thrs)
-  DD <- subset(DD,cell_tot < thrs)
+  D0 <- subset(DD,cell_tot >= s_min)
+  DD <- subset(DD,cell_tot < s_min)
+
+  print(paste0("Layer ","1",": ",nrow(D0)," obs allocated", sep = ""))
 
   # Second through L Layers
   if (L > 1) {
   for (j in 2:L) {
 
+    if (dim(DD)[1] > 0) {
     cellj<-cell_def[[j]];listj<-layers[[j]]
 
     DD[,cbind(cc[1],cc[2],"cell_tot")] <- list(NULL)
@@ -65,13 +68,19 @@ cell_defn <- function(D, S_min, layers) {
     names(tmp) <- c(cc,"cell_tot")
     DD <- merge(DD,tmp,by=cc)
 
-    D0 <- rbind(D0,subset(DD,cell_tot >= thrs))
+    matched   <- subset(DD,cell_tot >= s_min)
+    nomatched <- subset(DD,cell_tot < s_min)
+    print(paste0("Layer ",j,": ",nrow(matched)," obs allocated", sep = ""))
 
-    DD <- subset(DD,cell_tot < thrs)
+    D0 <- rbind(D0,matched)
+    DD <- nomatched
+    }else{
+    print(paste0("Layer ",j,": ",0," obs allocated", sep = ""))
+    }
 
   }
   }
-  print("Number of Excluded Observations")
+  print("Number of Excluded Obs")
   print(nrow(DD))
 
 

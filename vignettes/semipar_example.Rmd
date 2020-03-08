@@ -39,13 +39,13 @@ layers <- list(list1)
 
 A minimum cell size threshold also needs to be set. Let's set the minimum size to 15:
 ```{r}
-thrs <- 15
+th <- 15
 ```
 
 Then use `cell_defn` to allocate observations to cells, based on the variables in the layer. The one required variable is `adm`, which indicates how many admissions are represented by each observation. In this case, each observation is an admission, so we will set adm to 1 for all observations. Then we can run `cell_defn`.
 ```{r}
 discharge_data$adm <- 1
-outList <- cell_defn(discharge_data,thrs,layers)
+outList <- cell_defn(discharge_data,th,layers)
 ```
 
 The `cell_defn` function returns a list. The first item in the list is a new dataset that contains the observations that have been allocated to a cell.
@@ -58,19 +58,20 @@ print(nrow(discharge_data))
 
 The new dataset has `nrow(D0)` observations. `cell_defn` stated that it excluded some observations, those that were not allocated to a cell that met the minimum size threshold. The number of excluded observations added to the number of observations in the new dataset equals the number of observations in the original dataset. 
 
-We can instead use two layers to define cells. Adding a second, more coarse, layer will allow more observations to be allocated to cells that meet the minimum size threshold. Let's add a layer that uses three digit zip code only. 
+We can instead use two layers to define cells. Adding a second, more coarse, layer will allow more observations to be allocated to cells that meet the minimum size threshold. Let's add layers that use three digit zip code. 
 
 ```{r}
 discharge_data$zip3 <- floor(discharge_data$zip5/100)
-list1 <- c("drg","age","zip5")
-list2 <- c("zip3")
-layers <- list(list1, list2)
+list2 <- c("drg","age","zip5")
+list3 <- c("drg","age","zip3")
+list4 <- c("zip3")
+layers <- list(list2, list4, list3)
 ```
 
 With this new definition of layers, we can allocate observations like before:
 
 ```{r}
-outList <- cell_defn(discharge_data,thrs,layers)
+outList <- cell_defn(discharge_data,th,layers)
 D0 <- as.data.frame(outList[1])
 print(nrow(D0))
 print(nrow(discharge_data))
