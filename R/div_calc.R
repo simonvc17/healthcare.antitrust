@@ -7,16 +7,16 @@
 #'   \itemize{
 #'   \item cell: the id of the cell each observation has been allocated
 #'   \item hosp_id: hospital identifier (numeric)
-#'   \item Hospital: name of hospital (string)
+#'   \item hospital: name of hospital (string)
 #'   \item sys_id: system identifier (numeric)
-#'   \item System: name of system (string)
+#'   \item system: name of system (string)
 #'   \item party_ind: indicator for party hospitals
 #'   \item adm: the number of observations represented by the observation,
 #'   = 1 for all if each observation is one admission
 #'   }
 #'
 #' @details The output is hospital-level diversions for party hospitals. For system
-#' level diversion, let hosp_id and Hospital be equal to corresponding
+#' level diversion, let hosp_id and hospital be equal to corresponding
 #' system-level identifiers. Patients are not allowed to divert to
 #' within-system alternative hospitals.
 #'
@@ -33,18 +33,27 @@
 # original div_calc function.) Generalized from before, so party systems need not
 # be in order from 1,..,ns.
 
-# Required inputs: cell, hosp_id, Hospital, sys_id, System, party_ind, adm
+# Required inputs: cell, hosp_id, hospital, sys_id, system, party_ind, adm
 # where party_ind is 1 party hospitals, zero otherwise
 # and adm is the number of admissions represented by the observation. =1 for all if
 # each observation is one admissions
 # Note: this results in hospital level diversions for party hospitals. For system
-# level diversion, let hosp_id and Hospital be system-level identifiers.
+# level diversion, let hosp_id and hospital be system-level identifiers.
 # Patients are not allowed to divert to within-system alternative hospitals.
 
 div_calc <- function(D) {
-  check <- unique(subset(D,select=c(hosp_id,Hospital)))
+  check <- unique(subset(D,select=c(hosp_id,hospital)))
   if (length(unique(check$hosp_id)) != length(check$hosp_id)) {warning('Error: hosp_id associated with multiple hospital names')}
-  #if (length(unique(check$Hospital)) != length(check$Hospital)) {warning('Error: hospital name associated with multiple hosp_ids')}
+  #if (length(unique(check$hospital)) != length(check$hospital)) {warning('Error: hospital name associated with multiple hosp_ids')}
+
+  if (!"cell" %in% names(D)) {warning('Variable "cell" required in input dataset'); stop()}
+  if (!"hosp_id" %in% names(D)) {warning('Variable "hosp_id" required in input dataset'); stop()}
+  if (!"hospital" %in% names(D)) {warning('Variable "hospital" required in input dataset'); stop()}
+  if (!"sys_id" %in% names(D)) {warning('Variable "sys_id" required in input dataset'); stop()}
+  #if (!"system" %in% names(D)) {warning('Variable "system" required in input dataset'); stop()}
+  if (!"party_ind" %in% names(D)) {warning('Variable "party_ind" required in input dataset'); stop()}
+  if (!"adm" %in% names(D)) {warning('Variable "adm" required in input dataset'); stop()}
+
 
   iter <- 0
   D$party_sys_id <- D$party_ind*D$sys_id
@@ -52,8 +61,8 @@ div_calc <- function(D) {
 
   for (m in party_sys_list) {
     # Calculate cell-specific hospital diversion ratios
-    y_hosp_cell = aggregate(D$adm,by=list(D$cell,D$hosp_id,D$Hospital,D$party_sys_id),sum)
-    names(y_hosp_cell) <- c("cell","hosp_id","Hospital","party_sys_id","N_h")
+    y_hosp_cell = aggregate(D$adm,by=list(D$cell,D$hosp_id,D$hospital,D$party_sys_id),sum)
+    names(y_hosp_cell) <- c("cell","hosp_id","hospital","party_sys_id","N_h")
 
     y_hosp_cell$N <- ave(y_hosp_cell$N_h,y_hosp_cell$cell, FUN = sum)
     y_hosp_cell$share_h <- y_hosp_cell$N_h/y_hosp_cell$N
@@ -82,8 +91,8 @@ div_calc <- function(D) {
       y_hosp_cell$N_h_predict[y_hosp_cell$party_sys_id == m] <- 0
 
       # Sum across cells
-      y_hosp = aggregate(D$adm,by=list(D$hosp_id,D$Hospital,D$party_sys_id),sum)
-      names(y_hosp) <- c("hosp_id","Hospital","party_sys_id","N_h")
+      y_hosp = aggregate(D$adm,by=list(D$hosp_id,D$hospital,D$party_sys_id),sum)
+      names(y_hosp) <- c("hosp_id","hospital","party_sys_id","N_h")
 
       y_hosp$N_k <- 0
       y_hosp$N_k[y_hosp$hosp_id == k] <- y_hosp$N_h[y_hosp$hosp_id == k]
@@ -100,7 +109,7 @@ div_calc <- function(D) {
       print("Total Diversion")
       print(sum(y_hosp$div, na.rm = TRUE))
 
-      if (iter == 1) {out <- subset(y_hosp, select=c(hosp_id,Hospital,party_sys_id,N_h))}
+      if (iter == 1) {out <- subset(y_hosp, select=c(hosp_id,hospital,party_sys_id,N_h))}
 
       #out[,paste0("div_",m,"_",k)] <- y_hosp$div
       out[,paste0("div_from_",k)] <- y_hosp$div

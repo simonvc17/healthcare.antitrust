@@ -5,6 +5,7 @@
 
 # Let N=1,200 discharges
 # rm(list=ls())
+library(dplyr)
 
 N <- 1200
 N_drg <- 4
@@ -31,11 +32,11 @@ for (h in 1:H) {
 hosp_id <- max.col(util)
 
 discharge_data <- data.frame(drg, age, zip5, hosp_id)
-discharge_data$Hospital <- paste0("Hospital ",hosp_id)
+discharge_data$hospital <- paste0("Hospital ",hosp_id)
 discharge_data$sys_id <- hosp_id
 discharge_data$sys_id[discharge_data$hosp_id==2] <- 1
 discharge_data$sys_id[discharge_data$hosp_id==4] <- 3
-discharge_data$System <- paste0("System ",discharge_data$sys_id)
+discharge_data$system <- paste0("System ",discharge_data$sys_id)
 
 #save(discharge_data,file="data/discharge_data.RData")
 usethis::use_data(discharge_data, overwrite = TRUE)

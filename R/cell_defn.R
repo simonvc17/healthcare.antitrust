@@ -14,7 +14,7 @@
 #'
 #' @details The output is a list of datasets. The first item in the list
 #' is the original dataset, with observations allocated to cells. The
-#' second item in the list is a dataset of unmatched observations.
+#' second item in the list is a dataset of the unmatched observations.
 #'
 #' For more details see the example vignette by typing:
 #' \code{vignette("semipar_example", package = "healthcare.antitrust")}

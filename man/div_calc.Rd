@@ -11,9 +11,9 @@ div_calc(D)
 \itemize{
 \item cell: the id of the cell each observation has been allocated
 \item hosp_id: hospital identifier (numeric)
-\item Hospital: name of hospital (string)
+\item hospital: name of hospital (string)
 \item sys_id: system identifier (numeric)
-\item System: name of system (string)
+\item system: name of system (string)
 \item party_ind: indicator for party hospitals
 \item adm: the number of observations represented by the observation,
 = 1 for all if each observation is one admission
@@ -25,7 +25,7 @@ defined.
 }
 \details{
 The output is hospital-level diversions for party hospitals. For system
-level diversion, let hosp_id and Hospital be equal to corresponding
+level diversion, let hosp_id and hospital be equal to corresponding
 system-level identifiers. Patients are not allowed to divert to
 within-system alternative hospitals.
 
