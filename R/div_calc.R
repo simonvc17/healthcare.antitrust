@@ -14,6 +14,12 @@
 #'   \item adm: the number of observations represented by the observation,
 #'   = 1 for all if each observation is one admission
 #'   }
+#' @param dropDegenerateCell logical; specifies how to treat cells with a
+#' 100\% within-system share. If TRUE, observations in degenerate, 100\% share
+#' cells with be ignored in the diversion ratio calculation. If FALSE,
+#' any such individuals will be assigned to the outside option, but still
+#' included in the denominator, so that the inside-option diversion will total
+#' less than 100\%.
 #'
 #' @details The output is hospital-level diversions for party hospitals. For system
 #' level diversion, let hosp_id and hospital be equal to corresponding
@@ -41,7 +47,7 @@
 # level diversion, let hosp_id and hospital be system-level identifiers.
 # Patients are not allowed to divert to within-system alternative hospitals.
 
-div_calc <- function(D) {
+div_calc <- function(D, dropDegenerateCell = TRUE) {
   check <- unique(subset(D,select=c(hosp_id,hospital)))
   if (length(unique(check$hosp_id)) != length(check$hosp_id)) {warning('Error: hosp_id associated with multiple hospital names')}
   #if (length(unique(check$hospital)) != length(check$hospital)) {warning('Error: hospital name associated with multiple hosp_ids')}
@@ -79,8 +85,7 @@ div_calc <- function(D) {
     system_hosp <- sort(unique(y_hosp_cell$hosp_id[y_hosp_cell$party_sys_id == m]))
 
     for (k in system_hosp) {
-      print("Hosp Id")
-      print(k)
+      print(paste0("Hosp Id: ", k))
       iter <- iter + 1
 
       y_hosp_cell$N_k <- 0
@@ -101,13 +106,30 @@ div_calc <- function(D) {
       temp <- aggregate(y_hosp_cell$N_h_predict,by=list(y_hosp_cell$hosp_id),sum)
       names(temp) <- c("hosp_id","N_h_predict")
 
-      # Calculate hospital diversion ratios
       y_hosp <- merge(y_hosp,temp)
-      y_hosp$div <- (y_hosp$N_h_predict-y_hosp$N_h)/y_hosp$N_k
+
+      # Calculate hospital diversion ratios - two options for denom
+      if (dropDegenerateCell == FALSE) {
+        y_hosp$div <- (y_hosp$N_h_predict-y_hosp$N_h)/y_hosp$N_k
+      }
+      if (dropDegenerateCell == TRUE) {
+        y_hosp$movers <- y_hosp$N_h_predict - y_hosp$N_h
+        y_hosp$N_k_alt <- sum(y_hosp$movers[y_hosp$movers>0])
+        y_hosp$div <- (y_hosp$N_h_predict-y_hosp$N_h)/y_hosp$N_k_alt
+      }
+
+
       y_hosp$div[y_hosp$party_sys_id == m] <- NA
 
-      print("Total Diversion")
-      print(sum(y_hosp$div, na.rm = TRUE))
+      # Print flag if degenerate cells
+      degenlist <- y_hosp_cell$cell[is.na(y_hosp_cell$div) & y_hosp_cell$hosp_id == k]
+      if (length(degenlist) > 0) {
+        print("Note the following cells are degenerate:")
+        print(degenlist)
+
+        totdiv <- sum(y_hosp$div, na.rm = TRUE)
+        print(paste0("Total Diversion: ",totdiv))
+      }
 
       if (iter == 1) {out <- subset(y_hosp, select=c(hosp_id,hospital,party_sys_id,N_h))}
 

@@ -4,7 +4,7 @@
 \alias{div_calc}
 \title{Diversion Ratio Calculator}
 \usage{
-div_calc(D)
+div_calc(D, dropDegenerateCell = TRUE)
 }
 \arguments{
 \item{D}{Dataset of hospital discharges. Required variables:
@@ -18,6 +18,13 @@ div_calc(D)
 \item adm: the number of observations represented by the observation,
 = 1 for all if each observation is one admission
 }}
+
+\item{dropDegenerateCell}{logical; specifies how to treat cells with a
+100\% within-system share. If TRUE, observations in degenerate, 100\% share
+cells with be ignored in the diversion ratio calculation. If FALSE,
+any such individuals will be assigned to the outside option, but still
+included in the denominator, so that the inside-option diversion will total
+less than 100\%.}
 }
 \description{
 Calculates hospital-level diversion ratios, once cells have been
