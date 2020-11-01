@@ -94,7 +94,7 @@ cell_defn <- function(D, s_min, layers) {
   D0[,cbind("cell1","cell_tot")] <- list(NULL)
 
   # Return List of Outputs
-  newList <- list(D0, DD)
+  newList <- list("dataset" = D0, "unassigned" = DD)
   return(newList)
 }
 
