@@ -96,8 +96,8 @@ div_calc <- function(D, dropDegenerateCell = TRUE) {
       y_hosp_cell$N_h_predict[y_hosp_cell$party_sys_id == m] <- 0
 
       # Sum across cells
-      y_hosp = aggregate(D$adm,by=list(D$hosp_id,D$hospital,D$party_sys_id),sum)
-      names(y_hosp) <- c("hosp_id","hospital","party_sys_id","N_h")
+      y_hosp = aggregate(D$adm,by=list(D$hosp_id,D$hospital,D$party_sys_id,D$sys_id),sum)
+      names(y_hosp) <- c("hosp_id","hospital","party_sys_id","sys_id","N_h")
 
       y_hosp$N_k <- 0
       y_hosp$N_k[y_hosp$hosp_id == k] <- y_hosp$N_h[y_hosp$hosp_id == k]
@@ -131,7 +131,7 @@ div_calc <- function(D, dropDegenerateCell = TRUE) {
         print(paste0("Total Diversion: ",totdiv))
       }
 
-      if (iter == 1) {out <- subset(y_hosp, select=c(hosp_id,hospital,party_sys_id,N_h))}
+      if (iter == 1) {out <- subset(y_hosp, select=c(hosp_id,hospital,party_sys_id,sys_id,N_h))}
 
       #out[,paste0("div_",m,"_",k)] <- y_hosp$div
       out[,paste0("div_from_",k)] <- y_hosp$div
@@ -139,6 +139,10 @@ div_calc <- function(D, dropDegenerateCell = TRUE) {
     }
 
   }
+
+  # sort for return
+  out$party_sys_id[out$party_sys_id == 0] <- NA
+  out <- out[order(out$party_sys_id,out$sys_id,out$hosp_id),]
 
   return(out)
 }
