@@ -100,9 +100,18 @@ Now we can calculate diversions using the `div_calc` function.
 out <- div_calc(D0)
 ```
 
-The function prints the `hosp_id` of each hospital for which diversion is calculated. The resulting matrix shows diversions from each of the merging hospitals to all other hospitals. The diversions should sum to 1. (If the diversion does not sum to 1, that means that a degenerate cell exists and a notification flag will be printed.) We can verify that our diversions sum to one for Hospital 1:
+The function prints the `hosp_id` of each hospital for which diversion is calculated. If the total diversion for a given hospital does not sum to 1, that means that a degenerate cell exists and the `dropDegenerateCell` was set to `FALSE`. A notification flag will be printed whenever a degenerate cell exists for a given hospital.
+
+The function `div_calc` outputs two objects, a matrix of hospital-level diversions and a matrix aggregated to system-level diversions. The hospital-level matrix gives diversions from each of the merging hospitals to all other hospitals. The diversions should sum to 1. We can verify that our diversions sum to one for Hospital 1:
 
 ```{r}
-sum(out$div_from_1, na.rm = TRUE)
+divratio_hosp <- out$hosp_level
+sum(hosp_level$div_from_1, na.rm = TRUE)
 ```
 
+We can also print the hospital-level and system-level diversions.
+
+```{r}
+print(out$hosp_level)
+print(out$sys_level)
+```

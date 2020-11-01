@@ -63,7 +63,7 @@ div_calc <- function(D, dropDegenerateCell = TRUE) {
 
   iter <- 0
   D$party_sys_id <- D$party_ind*D$sys_id
-  party_sys_list <- unique(D$party_sys_id[D$party_sys_id > 0])
+  party_sys_list <- sort(unique(D$party_sys_id[D$party_sys_id > 0]))
 
   for (m in party_sys_list) {
     # Calculate cell-specific hospital diversion ratios
@@ -140,11 +140,27 @@ div_calc <- function(D, dropDegenerateCell = TRUE) {
 
   }
 
-  # sort for return
+  # sort for return of hospital-level diversions
   out$party_sys_id[out$party_sys_id == 0] <- NA
   out <- out[order(out$party_sys_id,out$sys_id,out$hosp_id),]
 
-  return(out)
+  # also calculate system-level diversion
+  out2 <- out
+  party_sys_list <- sort(unique(out$party_sys_id[!is.na(out$party_sys_id)]))
+  for (m in party_sys_list) {
+    party_hosp_list <- sort(unique(out$hosp_id[out$party_sys_id==m]))
+    ct <- out$N_h[out2$party_sys_id==m & !is.na(out2$party_sys_id)]
+    varnames <- paste("div_from_", party_hosp_list, sep="")
+
+    out2[,paste0("div_from_sys_",m)] <- (rowSums(as.matrix(out[varnames]) %*% diag(ct, nrow = length(ct))))  / (sum(ct))
+    out2[varnames] <- NULL
+  }
+
+
+  # Return List of Outputs
+  newList <- list("hosp_level" = out, "sys_level" = out2)
+  #newList <- list("hosp_level" = out)
+  return(newList)
 }
 
 
