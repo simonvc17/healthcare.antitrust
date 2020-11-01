@@ -51,7 +51,7 @@ outList <- cell_defn(discharge_data,th,layers)
 The `cell_defn` function returns a list. The first item in the list is a new dataset that contains the observations that have been allocated to a cell.
 
 ```{r}
-D0 <- as.data.frame(outList[1])
+D0 <- outList$dataset
 print(nrow(D0))
 print(nrow(discharge_data))
 ```
@@ -72,7 +72,7 @@ With this new definition of layers, we can allocate observations like before:
 
 ```{r}
 outList <- cell_defn(discharge_data,th,layers)
-D0 <- as.data.frame(outList[1])
+D0 <- outList$dataset
 print(nrow(D0))
 print(nrow(discharge_data))
 ```
@@ -106,7 +106,7 @@ The function `div_calc` outputs two objects, a matrix of hospital-level diversio
 
 ```{r}
 divratio_hosp <- out$hosp_level
-sum(hosp_level$div_from_1, na.rm = TRUE)
+sum(divratio_hosp$div_from_1, na.rm = TRUE)
 ```
 
 We can also print the hospital-level and system-level diversions.

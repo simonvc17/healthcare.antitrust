@@ -21,10 +21,13 @@
 #' included in the denominator, so that the inside-option diversion will total
 #' less than 100\%.
 #'
-#' @details The output is hospital-level diversions for party hospitals. For system
-#' level diversion, let hosp_id and hospital be equal to corresponding
-#' system-level identifiers. Patients are not allowed to divert to
-#' within-system alternative hospitals.
+#' @details Two objects are given as output. The first gives hospital-
+#' level diversions from party hospitals to all other hospitals. The
+#' second object is a matrix that aggregates party hospitals to systems,
+#' thus giving diversions from party systems to all other hospitals.
+#' For system-to-system level diversions, set hosp_id and hospital
+#' equal to corresponding system-level identifiers. Patients are not
+#' allowed to divert to within-system alternative hospitals.
 #'
 #' For more details see the example vignette by typing:
 #' \code{vignette("semipar_example", package = "healthcare.antitrust")}

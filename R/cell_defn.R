@@ -80,8 +80,7 @@ cell_defn <- function(D, s_min, layers) {
 
   }
   }
-  print("Number of Excluded Obs")
-  print(nrow(DD))
+  print(paste0("Number of Excluded Obs: ", nrow(DD)))
 
 
   #  Create a new cell ID based on combinations of 'cell' and 'cell_type'
