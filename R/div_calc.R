@@ -38,10 +38,6 @@
 ##################################################################
 # Diversion Ratio Calculator
 ##################################################################
-# div_calc calculates hospital-level diversion ratios. (Check whether still need
-# original div_calc function.) Generalized from before, so party systems need not
-# be in order from 1,..,ns.
-
 # Required inputs: cell, hosp_id, hospital, sys_id, system, party_ind, adm
 # where party_ind is 1 party hospitals, zero otherwise
 # and adm is the number of admissions represented by the observation. =1 for all if
