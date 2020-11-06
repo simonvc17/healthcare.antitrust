@@ -25,6 +25,7 @@
 #'
 #' For more details see the example vignette by typing:
 #' \code{vignette("semipar_example", package = "healthcare.antitrust")}
+#' @importFrom stats aggregate ave
 #' @export
 
 

@@ -19,6 +19,8 @@
 #' For more details see the example vignette by typing:
 #' \code{vignette("semipar_example", package = "healthcare.antitrust")}
 #'
+#' @importFrom stats aggregate
+#'
 #' @export
 
 # Here could also go Roxygen comments with example tags (or links to
