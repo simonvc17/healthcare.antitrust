@@ -11,9 +11,9 @@ and 7 variables:
   \item{age}{patient age}
   \item{zip5}{patient 5 digit zip code of residence}
   \item{hosp_id}{hospital identifier}
-  \item{Hospital}{hospital name}
+  \item{hospital}{hospital name}
   \item{sys_id}{system identifier}
-  \item{System}{system name}
+  \item{system}{system name}
 
 }}
 \source{
