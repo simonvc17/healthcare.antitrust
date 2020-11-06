@@ -115,3 +115,26 @@ We can also print the hospital-level and system-level diversions.
 print(out$hosp_level)
 print(out$sys_level)
 ```
+
+
+# Willingness-to-Pay Calculation
+
+The function `wtp_calc` can be used to calculate the willingness-to-pay (WTP) of a hospital system. This can be used to estimate the change in WTP that would occur after a merger, using the same data as before. The primary difference, is that `wtp_calc` will expect to find a variable `weight`; this variable is required because WTP calculations for hospitals sometimes involve weighting by DRG weights. If an equal weighting is desired for all observations, this variable can be set to 1.
+
+```{r}
+D0$weight <- 1
+
+out <- wtp_calc(D0)
+y_pre <- subset(out, party == 1)
+
+D0_post <- D0
+D0_post$sys_id[D0_post$party_ind == 1] <- 1
+
+out <- wtp_calc(D0_post)
+y_post <- subset(out, party == 1)
+
+y_pre <- aggregate(list(WTP_s = y_pre$WTP_s, WTP_s_wt = y_pre$WTP_s_wt, N_s=y_pre$N_s),by=list(y_party=y_pre$party),sum)
+
+print("% Change in WTP")
+print((y_post$WTP_s-y_pre$WTP_s)/(y_pre$WTP_s)*100)
+```
