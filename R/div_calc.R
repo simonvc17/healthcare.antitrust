@@ -48,6 +48,12 @@
 # Patients are not allowed to divert to within-system alternative hospitals.
 
 div_calc <- function(D, dropDegenerateCell = TRUE) {
+  #names(D)[names(D) == hosp_id] <- "hosp_id"
+  # and put hosp_id = "hosp_id" in fxn arg for generic var names
+
+  # To address check() NOTEs
+  N_h <- hosp_id <- hospital <- party_sys_id <- sys_id <- NULL
+
   check <- unique(subset(D,select=c(hosp_id,hospital)))
   if (length(unique(check$hosp_id)) != length(check$hosp_id)) {warning('Error: hosp_id associated with multiple hospital names')}
   #if (length(unique(check$hospital)) != length(check$hospital)) {warning('Error: hospital name associated with multiple hosp_ids')}

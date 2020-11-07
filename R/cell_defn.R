@@ -27,6 +27,9 @@
 # vignettes) and description of output. With tags @examples and @return.
 
 cell_defn <- function(D, s_min, layers) {
+  # To address check() NOTEs
+  cell_tot <- NULL
+
   cc <- c("cell","cell_type")
 
   # Create ID numbers for cells based on layers of decreasing refinement
