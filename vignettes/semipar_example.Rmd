@@ -81,7 +81,7 @@ The observations are first allocated to cells as before, and the remaining obser
 
 We are now able to calculate diversion ratios based on the cell definitions.
 
-# Diversion Ratio Calculation
+# Diversion ratio calculation
 
 We can calculate diversion ratios with the function `div_calc`. The required variables are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which was also required by `cell_defn`.
 
@@ -117,7 +117,7 @@ print(out$sys_level)
 ```
 
 
-# Willingness-to-Pay Calculation
+# Willingness-to-pay calculation
 
 The function `wtp_calc` can be used to calculate the willingness-to-pay (WTP) of a hospital system. This can be used to estimate the change in WTP that would occur after a merger, using the same data as before. The primary difference, is that `wtp_calc` will expect to find a variable `weight`; this variable is required because WTP calculations for hospitals sometimes involve weighting by DRG weights. If an equal weighting is desired for all observations, this variable can be set to 1.
 
