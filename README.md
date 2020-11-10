@@ -7,6 +7,8 @@ healthcare.antitrust
 <!-- badges: end -->
 The goal of healthcare.antitrust is to provide a set of tools commonly used in the antitrust analysis of healthcare markets. The main functions of the package can be used to implement the semiparametric estimation technique described in Raval, Rosenbaum, and Tenn (2017) "A Semiparametric Discrete Choice Model: An Application to Hospital Mergers."
 
+Disclaimer: The views expressed herein are those of the authors and do not necessarily reflect those of the Federal Trade Commission of any individual Commissioner.
+
 Installation
 ------------
 
