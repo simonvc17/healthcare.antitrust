@@ -6,11 +6,11 @@
 \alias{healthcare.antitrust-package}
 \title{healthcare.antitrust: Tools for Healthcare Antitrust Analysis}
 \description{
-The package contains tools for antitrust analysis of
+Tools for antitrust analysis of
     healthcare markets. It contains functions to implement the 
     semiparametric estimation technique described in Raval, Rosenbaum,
     and Tenn (2017) "A Semiparametric Discrete Choice Model: An Application
-    to Hospital Mergers."
+    to Hospital Mergers" <doi:10.1111/ecin.12454>.
 }
 \details{
 For more details see the example vignette by typing:
@@ -19,7 +19,7 @@ For more details see the example vignette by typing:
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://github.com/mpanhans/healthcare.antitrust}
+  \item \url{https://github.com/mpanhans/healthcare.antitrust}
 }
 
 }
