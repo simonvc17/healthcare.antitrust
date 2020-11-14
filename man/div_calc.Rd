@@ -21,7 +21,7 @@ div_calc(D, dropDegenerateCell = TRUE)
 
 \item{dropDegenerateCell}{logical; specifies how to treat cells with a
 100\% within-system share. If TRUE, observations in degenerate, 100\% share
-cells with be ignored in the diversion ratio calculation. If FALSE,
+cells will be ignored in the diversion ratio calculation. If FALSE,
 any such individuals will be assigned to the outside option, but still
 included in the denominator, so that the inside-option diversion will total
 less than 100\%.}
@@ -35,7 +35,7 @@ Two objects are given as output. The first gives hospital-
 level diversions from party hospitals to all other hospitals. The
 second object is a matrix that aggregates party hospitals to systems,
 thus giving diversions from party systems to all other hospitals.
-For system-to-system level diversions, set hosp_id and hospital
+For system-to-system diversions, set hosp_id and hospital
 equal to corresponding system-level identifiers. Patients are not
 allowed to divert to within-system alternative hospitals.
 

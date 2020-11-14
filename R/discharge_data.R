@@ -1,6 +1,6 @@
-#' A sample dataset of hospital discharges
+#' A simulated dataset of hospital discharges
 #'
-#' A sample dataset of hospital discharges containing patient
+#' A simulated dataset of hospital discharges containing patient
 #' characteristics.
 #'
 #' @format A data frame with 1,200 rows (one for each discharge)

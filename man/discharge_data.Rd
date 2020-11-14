@@ -3,7 +3,7 @@
 \docType{data}
 \name{discharge_data}
 \alias{discharge_data}
-\title{A sample dataset of hospital discharges}
+\title{A simulated dataset of hospital discharges}
 \format{A data frame with 1,200 rows (one for each discharge)
 and 7 variables:
 \describe{
@@ -23,7 +23,7 @@ Created as part of healthcare.antitrust package.
 discharge_data
 }
 \description{
-A sample dataset of hospital discharges containing patient
+A simulated dataset of hospital discharges containing patient
 characteristics.
 }
 \keyword{datasets}

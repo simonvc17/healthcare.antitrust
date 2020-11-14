@@ -30,6 +30,9 @@ cell_defn <- function(D, s_min, layers) {
   # To address check() NOTEs
   cell_tot <- NULL
 
+  #names(D)[names(D) == hosp_id] <- "hosp_id"
+  # and put hosp_id = "hosp_id" in fxn arg for generic var names
+
   cc <- c("cell","cell_type")
 
   # Create ID numbers for cells based on layers of decreasing refinement
