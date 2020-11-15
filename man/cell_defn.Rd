@@ -4,11 +4,10 @@
 \alias{cell_defn}
 \title{Allocate Observations to Cells}
 \usage{
-cell_defn(D, s_min, layers)
+cell_defn(D, s_min, layers, adm = "adm")
 }
 \arguments{
-\item{D}{Dataset of discharges. The one required variable is adm, which
-indicates how many admissions are represented by the observation.}
+\item{D}{Dataset of discharges.}
 
 \item{s_min}{Minimize cell size.}
 
@@ -16,7 +15,10 @@ indicates how many admissions are represented by the observation.}
 on which observations will be allocated to cells. The layers should
 be ordered in decreasing refinement, so that observations not allocated
 to a cell meeting the minimum size threshold can be allocated by a
-coaser layer.}
+more coase layer.}
+
+\item{adm}{Name of variable which indicates the number of admissions
+represented by an observation. Default variable name is \code{adm}.}
 }
 \description{
 Take a dataset of hospital discharges, and allocate them to cells that
@@ -25,7 +27,15 @@ meet a minimum threshold cell size.
 \details{
 The output is a list of datasets. The first item in the list
 is the original dataset, with observations allocated to cells. The
-second item in the list is a dataset of the unmatched observations.
+cells are designated by the variable \code{cell}, and the layer number in
+which the observation is allocated to the cell is given by the variable
+\code{cell_type}. The second item in the output list is a dataset of the
+unassigned observations.
+
+If the variable \code{adm} is not supplied, the function will assume that
+each observation represents one admission, and a variable \code{adm} will
+be created in the output dataset to indicate this.
+
 
 For more details see the example vignette by typing:
 \code{vignette("semipar_example", package = "healthcare.antitrust")}

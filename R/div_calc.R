@@ -3,17 +3,25 @@
 #' Calculates hospital-level diversion ratios, once cells have been
 #' defined.
 #'
-#' @param D Dataset of hospital discharges. Required variables:
-#'   \itemize{
-#'   \item cell: the id of the cell each observation has been allocated
-#'   \item hosp_id: hospital identifier (numeric)
-#'   \item hospital: name of hospital (string)
-#'   \item sys_id: system identifier (numeric)
-#'   \item system: name of system (string)
-#'   \item party_ind: indicator for party hospitals
-#'   \item adm: the number of observations represented by the observation,
-#'   = 1 for all if each observation is one admission
-#'   }
+#' @param D Dataset of hospital discharges, with required variables:
+#'   \code{cell}, \code{hosp_id}, \code{hospital}, \code{sys_id},
+#'   \code{party_ind}, \code{adm}. Use other function arguments to
+#'   indicate alternative variable names to the defaul names.
+#' @param cell Name of variable specifying cell to which each observation
+#'   has been allocated. Default variable name is \code{cell}. Can be
+#'   created by \code{cell_defn} function.
+#' @param hosp_id Name of variable specifying (numeric) hospital
+#'   identifier. Default variable name is \code{hosp_id}.
+#' @param hospital Name of variable specifying (string) hospital name.
+#'   Default variable name is \code{hospital}.
+#' @param sys_id Name of variable specifying (numeric) system identifier.
+#'   Default variable name is \code{sys_id}.
+#' @param party_ind Name of indicator variable for whether hospital is a
+#'   party from which diversions should be calculated. Default variable
+#'   name is \code{party_ind}.
+#' @param adm Name of variable indicating the number of admissions
+#'   represented by the observation. Set = 1 for every row if each
+#'   observation represents one admission.
 #' @param dropDegenerateCell logical; specifies how to treat cells with a
 #' 100\% within-system share. If TRUE, observations in degenerate, 100\% share
 #' cells will be ignored in the diversion ratio calculation. If FALSE,
@@ -21,13 +29,14 @@
 #' included in the denominator, so that the inside-option diversion will total
 #' less than 100\%.
 #'
-#' @details Two objects are given as output. The first gives hospital-
-#' level diversions from party hospitals to all other hospitals. The
-#' second object is a matrix that aggregates party hospitals to systems,
-#' thus giving diversions from party systems to all other hospitals.
-#' For system-to-system diversions, set hosp_id and hospital
-#' equal to corresponding system-level identifiers. Patients are not
-#' allowed to divert to within-system alternative hospitals.
+#' @details Two objects are given as output. The first is a matrix giving
+#'  hospital-level diversions from party hospitals to all other hospitals.
+#'  The second object is a matrix that aggregates party hospitals to
+#'  systems, thus giving diversions from party systems to all other
+#'  hospitals. For system-to-system diversions, set \code{hosp_id} and
+#'  \code{hospital} equal to corresponding system-level identifiers.
+#'  Patients are not allowed to divert to within-system alternative
+#'  hospitals.
 #'
 #' For more details see the example vignette by typing:
 #' \code{vignette("semipar_example", package = "healthcare.antitrust")}
@@ -43,16 +52,31 @@
 # where party_ind is 1 party hospitals, zero otherwise
 # and adm is the number of admissions represented by the observation. =1 for all if
 # each observation is one admissions
-# Note: this results in hospital level diversions for party hospitals. For system
-# level diversion, let hosp_id and hospital be system-level identifiers.
-# Patients are not allowed to divert to within-system alternative hospitals.
 
-div_calc <- function(D, dropDegenerateCell = TRUE) {
-  #names(D)[names(D) == hosp_id] <- "hosp_id"
-  # and put hosp_id = "hosp_id" in fxn arg for generic var names
+# Could be nice to pass-through system name string variable to output
+# if it is supplied.
+
+div_calc <- function(D,
+                     cell = "cell",
+                     hosp_id = "hosp_id",
+                     hospital = "hospital",
+                     sys_id = "sys_id",
+                     party_ind = "party_ind",
+                     adm = "adm",
+                     dropDegenerateCell = TRUE) {
+
+  # allow for generic variable names
+  names(D)[names(D) == cell] <- "cell"
+  names(D)[names(D) == hosp_id] <- "hosp_id"
+  names(D)[names(D) == hospital] <- "hospital"
+  names(D)[names(D) == sys_id] <- "sys_id"
+  names(D)[names(D) == party_ind] <- "party_ind"
+  names(D)[names(D) == adm] <- "adm"
+
 
   # To address check() NOTEs
-  N_h <- hosp_id <- hospital <- party_sys_id <- sys_id <- NULL
+  #N_h <- hosp_id <- hospital <- party_sys_id <- sys_id <- NULL
+  N_h <- NULL
 
   check <- unique(subset(D,select=c(hosp_id,hospital)))
   if (length(unique(check$hosp_id)) != length(check$hosp_id)) {warning('Error: hosp_id associated with multiple hospital names')}
@@ -164,6 +188,19 @@ div_calc <- function(D, dropDegenerateCell = TRUE) {
 
 
   # Return List of Outputs
+  names(out)[names(out) == "cell"] <- cell
+  names(out2)[names(out2) == "cell"] <- cell
+  names(out)[names(out) == "hosp_id"] <- hosp_id
+  names(out2)[names(out2) == "hosp_id"] <- hosp_id
+  names(out)[names(out) == "hospital"] <- hospital
+  names(out2)[names(out2) == "hospital"] <- hospital
+  names(out)[names(out) == "sys_id"] <- sys_id
+  names(out2)[names(out2) == "sys_id"] <- sys_id
+  names(out)[names(out) == "party_ind"] <- party_ind
+  names(out2)[names(out2) == "party_ind"] <- party_ind
+  names(out)[names(out) == "adm"] <- adm
+  names(out2)[names(out2) == "adm"] <- adm
+
   newList <- list("hosp_level" = out, "sys_level" = out2)
   #newList <- list("hosp_level" = out)
   return(newList)

@@ -4,20 +4,43 @@
 \alias{div_calc}
 \title{Diversion Ratio Calculator}
 \usage{
-div_calc(D, dropDegenerateCell = TRUE)
+div_calc(
+  D,
+  cell = "cell",
+  hosp_id = "hosp_id",
+  hospital = "hospital",
+  sys_id = "sys_id",
+  party_ind = "party_ind",
+  adm = "adm",
+  dropDegenerateCell = TRUE
+)
 }
 \arguments{
-\item{D}{Dataset of hospital discharges. Required variables:
-\itemize{
-\item cell: the id of the cell each observation has been allocated
-\item hosp_id: hospital identifier (numeric)
-\item hospital: name of hospital (string)
-\item sys_id: system identifier (numeric)
-\item system: name of system (string)
-\item party_ind: indicator for party hospitals
-\item adm: the number of observations represented by the observation,
-= 1 for all if each observation is one admission
-}}
+\item{D}{Dataset of hospital discharges, with required variables:
+\code{cell}, \code{hosp_id}, \code{hospital}, \code{sys_id},
+\code{party_ind}, \code{adm}. Use other function arguments to
+indicate alternative variable names to the defaul names.}
+
+\item{cell}{Name of variable specifying cell to which each observation
+has been allocated. Default variable name is \code{cell}. Can be
+created by \code{cell_defn} function.}
+
+\item{hosp_id}{Name of variable specifying (numeric) hospital
+identifier. Default variable name is \code{hosp_id}.}
+
+\item{hospital}{Name of variable specifying (string) hospital name.
+Default variable name is \code{hospital}.}
+
+\item{sys_id}{Name of variable specifying (numeric) system identifier.
+Default variable name is \code{sys_id}.}
+
+\item{party_ind}{Name of indicator variable for whether hospital is a
+party from which diversions should be calculated. Default variable
+name is \code{party_ind}.}
+
+\item{adm}{Name of variable indicating the number of admissions
+represented by the observation. Set = 1 for every row if each
+observation represents one admission.}
 
 \item{dropDegenerateCell}{logical; specifies how to treat cells with a
 100\% within-system share. If TRUE, observations in degenerate, 100\% share
@@ -31,13 +54,14 @@ Calculates hospital-level diversion ratios, once cells have been
 defined.
 }
 \details{
-Two objects are given as output. The first gives hospital-
-level diversions from party hospitals to all other hospitals. The
-second object is a matrix that aggregates party hospitals to systems,
-thus giving diversions from party systems to all other hospitals.
-For system-to-system diversions, set hosp_id and hospital
-equal to corresponding system-level identifiers. Patients are not
-allowed to divert to within-system alternative hospitals.
+Two objects are given as output. The first is a matrix giving
+ hospital-level diversions from party hospitals to all other hospitals.
+ The second object is a matrix that aggregates party hospitals to
+ systems, thus giving diversions from party systems to all other
+ hospitals. For system-to-system diversions, set \code{hosp_id} and
+ \code{hospital} equal to corresponding system-level identifiers.
+ Patients are not allowed to divert to within-system alternative
+ hospitals.
 
 For more details see the example vignette by typing:
 \code{vignette("semipar_example", package = "healthcare.antitrust")}
