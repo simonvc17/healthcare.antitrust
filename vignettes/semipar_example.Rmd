@@ -21,14 +21,14 @@ knitr::opts_chunk$set(
 This vignette shows how to use healthcare.antitrust to implement semiparametric demand estimation of hospital discharge data.
 
 # Cell definitions
-The first step is to assign observations to 'cells' within which the substitution proportional to share is assumed to hold. This can be done with the `cell_defn` function. Begin by loading the example dataset of hospital discharges:
+The first step is to assign observations to 'cells' within which the substitution proportional to share is assumed to hold. This can be done with the `cell_defn` function. Begin by loading the example simulation dataset of hospital discharges:
 
 ```{r}
 library(healthcare.antitrust)
 data(discharge_data, package = "healthcare.antitrust")
 ```
 
-This sample dataset contains hospital discharges, with each observation including a hospital identifier and patient characteristics (DRG diagnosis code, patient age, and patient zip code of residence).
+This simulated dataset contains hospital discharges, with each observation including a hospital identifier and patient characteristics (DRG diagnosis code, patient age, and patient zip code of residence).
 
 The observations will be grouped into cells based on variables in the dataset. Let's define cells based on three variables: the DRG diagnosis code, the patient age, and the patient zip code of residence.
 
@@ -83,9 +83,9 @@ We are now able to calculate diversion ratios based on the cell definitions.
 
 # Diversion ratio calculation
 
-We can calculate diversion ratios with the function `div_calc`. The required variables are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which was also required by `cell_defn`.
+We can calculate diversion ratios with the function `div_calc`. The required variables are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which is created by `cell_defn` if it does not exist.
 
-Finally, we need to specify a party hospital indicator, `party_ind`, for which diversion ratios will be calculated. Suppose hospitals 1, 2, and 5 are merging.
+Finally, we need to specify an indicator for whether a hospital is a merging party; the variable to do so is `party_ind`, and these are the hospitals for which diversion ratios will be calculated. Suppose hospitals 1, 2, and 5 are merging.
 
 ```{r}
 D0$party_ind <- 0
