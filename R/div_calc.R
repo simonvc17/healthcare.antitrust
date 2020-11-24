@@ -82,11 +82,15 @@ div_calc <- function(D,
   if (length(unique(check$hosp_id)) != length(check$hosp_id)) {warning('Error: hosp_id associated with multiple hospital names')}
   #if (length(unique(check$hospital)) != length(check$hospital)) {warning('Error: hospital name associated with multiple hosp_ids')}
 
+  # Error checks
+  if (!is(D,"data.frame")) {warning('Input needs to be a dataframe'); stop()}
+  if (!is(dropDegenerateCell,"logical")) {warning('Input dropDegenerateCell needs to be a logical'); stop()}
+
+  # Var name checks
   if (!"cell" %in% names(D)) {warning('Variable "cell" required in input dataset'); stop()}
   if (!"hosp_id" %in% names(D)) {warning('Variable "hosp_id" required in input dataset'); stop()}
   if (!"hospital" %in% names(D)) {warning('Variable "hospital" required in input dataset'); stop()}
   if (!"sys_id" %in% names(D)) {warning('Variable "sys_id" required in input dataset'); stop()}
-  #if (!"system" %in% names(D)) {warning('Variable "system" required in input dataset'); stop()}
   if (!"party_ind" %in% names(D)) {warning('Variable "party_ind" required in input dataset'); stop()}
   if (!"adm" %in% names(D)) {warning('Variable "adm" required in input dataset'); stop()}
 

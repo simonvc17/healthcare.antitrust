@@ -39,6 +39,12 @@ cell_defn <- function(D, s_min, layers, adm = "adm") {
   # To address check() NOTEs
   cell_tot <- NULL
 
+  # Error checks
+  if (!is(D,"data.frame")) {warning('Input needs to be a dataframe'); stop()}
+  if (!is(s_min,"numeric")) {warning('Input min cell size needs to be numeric'); stop()}
+  if (length(s_min)!=1) {warning('Input min cell size needs to be length 1'); stop()}
+  if (!is(layers,"list")) {warning('Input layers need to be a list'); stop()}
+
   # Allow adm variable name to be missing.
   names(D)[names(D) == adm] <- "adm"
   if (!"adm" %in% names(D)) {message('Assuming one admission per row. Variable adm created.'); D$adm  <- 1}
