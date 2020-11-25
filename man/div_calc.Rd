@@ -35,8 +35,8 @@ Default variable name is \code{hospital}.}
 Default variable name is \code{sys_id}.}
 
 \item{party_ind}{Name of indicator variable for whether hospital is a
-party from which diversions should be calculated. Default variable
-name is \code{party_ind}.}
+merging party from which diversions should be calculated. Default
+variable name is \code{party_ind}.}
 
 \item{adm}{Name of variable indicating the number of admissions
 represented by the observation. Set = 1 for every row if each
