@@ -7,8 +7,6 @@ healthcare.antitrust
 <!-- badges: end -->
 The goal of healthcare.antitrust is to provide a set of tools commonly used in the antitrust analysis of healthcare markets. The main functions of the package can be used to implement the semiparametric estimation technique described in Raval, Rosenbaum, and Tenn (2017) "A Semiparametric Discrete Choice Model: An Application to Hospital Mergers."
 
-Disclaimer: The views expressed herein are those of the authors and do not necessarily reflect those of the Federal Trade Commission of any individual Commissioner.
-
 Installation
 ------------
 
@@ -29,6 +27,19 @@ Example
 -------
 
 See the package vignette for examples.
+
+Disclaimer
+==========
+
+This software contains materials that originally came from the U.S. Federal Trade Commission (FTC) and is in the public domain.
+
+No warranty, expressed or implied, is made by the authors or the FTC as to the the accuracy and functioning of the program and related program material nor shall the fact of distribution constitute any such warranty, and no responsibility is assumed by the authors or the FTC in connection therewith.
+
+Any views expressed in this software or documentation are those of the authors and do not necessarily reflect those of the Federal Trade Commission or any individual Commissioner.
+
+This software is provided "AS IS."
+
+[![CC0](http://i.creativecommons.org/p/zero/1.0/88x31.png)](http://creativecommons.org/publicdomain/zero/1.0/)
 
 <!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
 <!-- ```{r cars} -->

@@ -9,7 +9,9 @@ Description: Tools for antitrust analysis of
     semiparametric estimation technique described in Raval, Rosenbaum,
     and Tenn (2017) "A Semiparametric Discrete Choice Model: An Application
     to Hospital Mergers" <doi:10.1111/ecin.12454>.
-License: MIT + file LICENSE
+License: CC0
+Copyright: This software contains materials that originally came from 
+    the U.S. Federal Trade Commission (FTC) and is in the public domain.
 Encoding: UTF-8
 LazyData: true
 Depends:
