@@ -89,7 +89,9 @@ We are now able to calculate diversion ratios based on the cell definitions.
 
 # Diversion ratio calculation
 
-Once observations have been assigned to cells, we can now calculate diversion ratios with the function `div_calc`. The required variables in the input dataframe are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which is created by `cell_defn` if it does not exist.
+Once observations have been assigned to cells, we can now calculate diversion ratios with the function `div_calc`. Within each cell $c$, the diversion from a hospital $k$ to hospital $h$ is given by $d^c_{k,h} = \frac{s^c_h}{1 - s^c_{m(k)}}$ where $s^c_h$ is the share of cell $c$ admissions to hospital $h$, and $s^c_{m(k)}$ is the share of cell $c$ admissions at hospital $k$ or any other hospital in the same system as $k$. The overall diversions are then calculated by aggregating over cells (See Raval, Rosenbaum, and Tenn (2017) for details.)
+
+The required variables in the input dataframe are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which is created by `cell_defn` if it does not exist.
 
 Finally, we need to specify an indicator for the set of hospitals we are interested in diversions among, for example the hospitals that are parties in a proposed merger. The variable to indicate such hospitals is `party_ind`, and these are the hospitals for which diversion ratios will be calculated. We are interested in studying a proposed merger including hospitals 1, 2, and 5, and so we assign them the party indicator variable.
 
