@@ -18,37 +18,39 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette shows how to use healthcare.antitrust to implement semiparametric demand estimation of hospital discharge data.
+This vignette shows how to use healthcare.antitrust to implement the semiparametric demand estimation technique developed in Raval, Rosenbaum, and Tenn (2017) "A Semiparametric Discrete Choice Model: An Application to Hospital Mergers" <doi:10.1111/ecin.12454>. This model is useful to estimate "diversion ratios" which are used to assess substitutability between merging parties' products in antitrust analysis.
+
+The method is illustrated using a simulated dataset of hospital discharges that is included with the healthcare.antitrust package. This simulated dataset mimics the basic structure of real hospital discharge data, with each observation including a hospital identifier and patient characteristics (DRG diagnosis code, patient age, and patient zip code of residence). The data includes 1,200 discharges from eight hospitals. 
+
+Suppose that the analyst is interested in estimating diversion ratios between hospitals in System 1, which includes Hospitals 1 and 2, and Hospital 5, which is an independent hospital. This vignette will show how to implement each step to arrive at the estimate.
 
 # Cell definitions
-The first step is to assign observations to 'cells' within which the substitution proportional to share is assumed to hold. This can be done with the `cell_defn` function. Begin by loading the example simulation dataset of hospital discharges:
+The first step is to assign observations to 'cells,' within which the substitution proportional to share will be assumed to hold. This assignment of observations can be done with the `cell_defn` function. Begin by loading the example simulation dataset of hospital discharges:
 
 ```{r}
 library(healthcare.antitrust)
 data(discharge_data, package = "healthcare.antitrust")
 ```
 
-This simulated dataset contains hospital discharges, with each observation including a hospital identifier and patient characteristics (DRG diagnosis code, patient age, and patient zip code of residence).
-
-The observations will be grouped into cells based on variables in the dataset. Let's define cells based on three variables: the DRG diagnosis code, the patient age, and the patient zip code of residence.
+The observations will be grouped into cells based on variables in the dataset. Let's define cells based on three variables: the DRG diagnosis code, the patient age, and the patient zip code of residence. We do this by specifying the variables and then saving them in a list variable called `layers`.
 
 ```{r}
 list1 <- c("drg","age","zip5")
 layers <- list(list1)
 ```
 
-A minimum cell size threshold also needs to be set. Let's set the minimum size to 15:
+A minimum cell size threshold also needs to be set. Observations will only be assigned to a cell if that cell includes at least the minimum threshold number of observations. Let's set the minimum size to 15:
 ```{r}
 th <- 15
 ```
 
-Then use `cell_defn` to allocate observations to cells, based on the variables in the layer. The one required variable is `adm`, which indicates how many admissions are represented by each observation. In this case, each observation is an admission, so we will set adm to 1 for all observations. Then we can run `cell_defn`.
+Then use `cell_defn` to allocate observations to cells, based on the variables in the layer. The one variable that needs to be included in the dataframe is a variable specifying the number of admissions represented by each observation. By default, this variable name is `adm`, and if present the function `cell_defn` will use it as the admission count. Alternatively, another variable can be indicated as the admission count variable. If no variable is specified as the admission count and `adm` is not present in the dataframe, `cell_defn` will assume each observation represents one admission and create a variable `adm` always equal to one. We will go ahead and create the variable in our dataframe, and then run `cell_defn`.
 ```{r}
 discharge_data$adm <- 1
 outList <- cell_defn(discharge_data,th,layers)
 ```
 
-The `cell_defn` function returns a list. The first item in the list is a new dataset that contains the observations that have been allocated to a cell.
+The `cell_defn` function prints a message indicating the number of obervations assigned to cells, and also returns a list. The first item in the return list is a new dataset that contains the observations that have been allocated to a cell, as well as their assignment.
 
 ```{r}
 D0 <- outList$dataset
@@ -58,14 +60,16 @@ print(nrow(discharge_data))
 
 The new dataset has `nrow(D0)` observations. `cell_defn` stated that it excluded some observations, those that were not allocated to a cell that met the minimum size threshold. The number of excluded observations added to the number of observations in the new dataset equals the number of observations in the original dataset. 
 
-We can instead use two layers to define cells. Adding a second, more coarse, layer will allow more observations to be allocated to cells that meet the minimum size threshold. Let's add layers that use three digit zip code. 
+Because observations are not all assigned to a cell, it is useful to specify several "layers" of variables in order to assign observations to cells. Using a more coarse set of variables will assign more observations, since the cells will be larger and more likely to exceed the minimum size threshold. But finer layers allow one to better account for heterogeneity in preferences across different types of people. That is why `cell_defn` allows for input of many layers, and they should be ordered by increasing coaseness. This will assign observations by more granular categories at first, and then for remaining unassigned individuals, they will be assigned into more coarse groupings.  
+
+Instead of using only one layer, we can modify our example to instead use three layers to define cells. Adding more coarse layers will allow more observations to be allocated to cells that meet the minimum size threshold. Let's add layers that use three digit zip codes instead of the five digit zip code.
 
 ```{r}
 discharge_data$zip3 <- floor(discharge_data$zip5/100)
-list2 <- c("drg","age","zip5")
-list3 <- c("drg","age","zip3")
-list4 <- c("zip3")
-layers <- list(list2, list4, list3)
+list1 <- c("drg","age","zip5")
+list2 <- c("drg","age","zip3")
+list3 <- c("zip3")
+layers <- list(list1, list2, list3)
 ```
 
 With this new definition of layers, we can allocate observations like before:
@@ -79,13 +83,15 @@ print(nrow(discharge_data))
 
 The observations are first allocated to cells as before, and the remaining observations are allocated to a cell based on three digit zip code only. With these definitions, every observation is allocated to a cell that meets the minimum size threshold that was set.
 
+Note that in each layer, `cell_defn` only assigns observations that have not been assigned in previous layers. That is, the function assigns observations without replacement. An alternative method can be used, in which assignment at each layer is done by sampling with replacement from all observation that meet the cell criteria, even if they have been previously assigned in a finer layer. This option of assigning with replacement is currently not implemented.
+
 We are now able to calculate diversion ratios based on the cell definitions.
 
 # Diversion ratio calculation
 
-We can calculate diversion ratios with the function `div_calc`. The required variables are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which is created by `cell_defn` if it does not exist.
+Once observations have been assigned to cells, we can now calculate diversion ratios with the function `div_calc`. The required variables in the input dataframe are `cell`, which has been defined by the `cell_defn` function, as well as hospital and system identifiers: `hosp_id`,`Hospital`,`sys_id`, and `System`. The function also requires `adm`, which is created by `cell_defn` if it does not exist.
 
-Finally, we need to specify an indicator for whether a hospital is a merging party; the variable to do so is `party_ind`, and these are the hospitals for which diversion ratios will be calculated. Suppose hospitals 1, 2, and 5 are merging.
+Finally, we need to specify an indicator for the set of hospitals we are interested in diversions among, for example the hospitals that are parties in a proposed merger. The variable to indicate such hospitals is `party_ind`, and these are the hospitals for which diversion ratios will be calculated. We are interested in studying a proposed merger including hospitals 1, 2, and 5, and so we assign them the party indicator variable.
 
 ```{r}
 D0$party_ind <- 0
@@ -100,7 +106,7 @@ Now we can calculate diversions using the `div_calc` function.
 out <- div_calc(D0)
 ```
 
-The function prints the `hosp_id` of each hospital for which diversion is calculated. If the total diversion for a given hospital does not sum to 1, that means that a degenerate cell exists and the `dropDegenerateCell` was set to `FALSE`. A notification flag will be printed whenever a degenerate cell exists for a given hospital.
+The function prints the `hosp_id` of each hospital for which diversion is calculated. 
 
 The function `div_calc` outputs two objects, a matrix of hospital-level diversions and a matrix aggregated to system-level diversions. The hospital-level matrix gives diversions from each of the merging hospitals to all other hospitals. The diversions should sum to 1. We can verify that our diversions sum to one for Hospital 1:
 
@@ -116,14 +122,29 @@ print(out$hosp_level)
 print(out$sys_level)
 ```
 
+## Some notes
+If the total diversion for a given hospital does not sum to 1, that means that at least one degenerate cell exists, meaning that there exists a cell where every individual assigned to that cell visits the same hospital. Such cells cause problems for the method used here, which predicts diversions for individuals in a cell based on the shares within that cell. If the share is 100\% in a cell, the model cannot make any prediction about to where those individuals would substitute. 
+
+By default, `div_calc` will drop any degenerate cells so that diversions will still sum to 1. If a degenerate cell exists and the `dropDegenerateCell` option is set to `FALSE`, the diversion for a hospital may sum to less than one because degenerate cells will not be dropped. A notification flag will be printed whenever a degenerate cell exists for a given hospital.
+
 
 # Willingness-to-pay calculation
 
-The function `wtp_calc` can be used to calculate the willingness-to-pay (WTP) of a hospital system. This can be used to estimate the change in WTP that would occur after a merger, using the same data as before. The primary difference, is that `wtp_calc` will expect to find a variable `weight`; this variable is required because WTP calculations for hospitals sometimes involve weighting by DRG weights. If an equal weighting is desired for all observations, this variable can be set to 1.
+Once observations have been assigned to cells, one can also use the function `wtp_calc` to calculate the willingness-to-pay (WTP) of a hospital system (see Capps, Dranove, and Satterthwaite (2003) "Competition and Market Power in Option Demand Markets" <https://www.jstor.org/stable/1593786>). This can be used to estimate the change in WTP that would occur after a merger, using the discharge data as we have been using.
+
+Within this semiparametric estimation method, the formulas for WTP are as follows. For individuals in a given cell $c$, the choice probabiities for a given hospital $j$ are estimated by $s_j^c = \frac{N^c_j}{N^c}$, where $N^c$ is the number of admissions belonging to cell $c$, and $N^c_j$ is the number of admissions from cell $c$ that visit hospital $j$. The WTP for the cell is then given by $WTP_c(j) = \ln \frac{1}{1-s_j^c}$. The population WTP for hospital $j$ is then simply the weighted sum across cells:
+
+$WTP(j) = \sum_c N^c \times WTP_c(j)$
+
+To calculate the change in WTP resulting from a merger, first note the general formula for calcuating WTP for a system $M$ is:
+
+$WTP_c(M) = \ln \frac{1}{1- \sum_{j \in M} s_j^c}$
+
+Aggregating across cells gives the population WTP. The changing in WTP from a merger can then be given as the WTP of the post-merger system minus the WTP of the sum of the systems pre-merger. If we denote by $M$ the hypothetical post-merger system and $M_1$ and $M_2$ the systems before they merge, then as a percentage increase the change in willingness-to-pay is given by $\Delta WTP = \frac{WTP(M) - (WTP(M_1) + WTP(M_2)) }{WTP(M_1) + WTP(M_2)}$
+
+To implement this calculation using the `wtp_calc` function, we calculate the WTP for both systems pre-merger as well as for a hypothetical combined system.
 
 ```{r}
-D0$weight <- 1
-
 out <- wtp_calc(D0)
 y_pre <- subset(out, party == 1)
 
@@ -138,3 +159,5 @@ y_pre <- aggregate(list(WTP_s = y_pre$WTP_s, WTP_s_wt = y_pre$WTP_s_wt, N_s=y_pr
 print("% Change in WTP")
 print((y_post$WTP_s-y_pre$WTP_s)/(y_pre$WTP_s)*100)
 ```
+
+This standard approach makes the assumption that WTP per dollar is constant across diagnoses. One alternative approach is to weight each admission by the diagnoses code (such as DRG) for each admission. This can be done with `wtp_calc` by providing a variable `weight`. For example, it is sometimes desirable to weight the WTP calculation by DRG weights. If weight is provided, `wtp_calc` will provide both a weighted an unweighted calculation for WTP. Otherwise, `wtp_calc` will assume a weight of 1 and both the unweighted and weighted WTP estimates will be equivalent.

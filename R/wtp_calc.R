@@ -65,7 +65,11 @@ wtp_calc <- function(D,
   names(D)[names(D) == sys_id] <- "sys_id"
   names(D)[names(D) == party_ind] <- "party_ind"
   names(D)[names(D) == adm] <- "adm"
+
+  # allow weight to be named or, if missing, set = 1.
   names(D)[names(D) == weight] <- "weight"
+  if (!"weight" %in% names(D)) { D$weight  <- 1}
+
 
   D$totalweight <- D$weight*D$adm  # in case some obs are aggregated admissions
 
