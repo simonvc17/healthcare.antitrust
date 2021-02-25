@@ -1,7 +1,7 @@
 Package: healthcare.antitrust
 Type: Package
 Title: Tools for Healthcare Antitrust Analysis
-Version: 0.1.2
+Version: 0.1.3
 Author: Matthew T Panhans <mpanhans@ftc.gov>
 Maintainer: Matthew T Panhans <mpanhans@gmail.com>
 Description: Tools for antitrust analysis of
