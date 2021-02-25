@@ -65,20 +65,20 @@ div_calc <- function(D,
                      adm = "adm",
                      dropDegenerateCell = TRUE) {
 
-  # allow for generic variable names
-  names(D)[names(D) == cell] <- "cell"
-  names(D)[names(D) == hosp_id] <- "hosp_id"
-  names(D)[names(D) == hospital] <- "hospital"
-  names(D)[names(D) == sys_id] <- "sys_id"
-  names(D)[names(D) == party_ind] <- "party_ind"
-  names(D)[names(D) == adm] <- "adm"
+  # allow for generic variable names - old. Now use [] instead of $
+  #names(D)[names(D) == cell] <- "cell"
+  #names(D)[names(D) == hosp_id] <- "hosp_id"
+  #names(D)[names(D) == hospital] <- "hospital"
+  #names(D)[names(D) == sys_id] <- "sys_id"
+  #names(D)[names(D) == party_ind] <- "party_ind"
+  #names(D)[names(D) == adm] <- "adm"
 
 
   # To address check() NOTEs
   #N_h <- hosp_id <- hospital <- party_sys_id <- sys_id <- NULL
   N_h <- NULL
 
-  check <- unique(subset(D,select=c(hosp_id,hospital)))
+  check <- unique(D[c(hosp_id,hospital)])
   if (length(unique(check$hosp_id)) != length(check$hosp_id)) {warning('Error: hosp_id associated with multiple hospital names')}
   #if (length(unique(check$hospital)) != length(check$hospital)) {warning('Error: hospital name associated with multiple hosp_ids')}
 
@@ -86,22 +86,29 @@ div_calc <- function(D,
   if (!is(D,"data.frame")) {warning('Input needs to be a dataframe'); stop()}
   if (!is(dropDegenerateCell,"logical")) {warning('Input dropDegenerateCell needs to be a logical'); stop()}
 
-  # Var name checks
-  if (!"cell" %in% names(D)) {warning('Variable "cell" required in input dataset'); stop()}
-  if (!"hosp_id" %in% names(D)) {warning('Variable "hosp_id" required in input dataset'); stop()}
-  if (!"hospital" %in% names(D)) {warning('Variable "hospital" required in input dataset'); stop()}
-  if (!"sys_id" %in% names(D)) {warning('Variable "sys_id" required in input dataset'); stop()}
-  if (!"party_ind" %in% names(D)) {warning('Variable "party_ind" required in input dataset'); stop()}
-  if (!"adm" %in% names(D)) {warning('Variable "adm" required in input dataset'); stop()}
+  # old Var name checks
+  #if (!"cell" %in% names(D)) {warning('Variable "cell" required in input dataset'); stop()}
+  #if (!"hosp_id" %in% names(D)) {warning('Variable "hosp_id" required in input dataset'); stop()}
+  #if (!"hospital" %in% names(D)) {warning('Variable "hospital" required in input dataset'); stop()}
+  #if (!"sys_id" %in% names(D)) {warning('Variable "sys_id" required in input dataset'); stop()}
+  #if (!"party_ind" %in% names(D)) {warning('Variable "party_ind" required in input dataset'); stop()}
+  #if (!"adm" %in% names(D)) {warning('Variable "adm" required in input dataset'); stop()}
 
+  # Updated var checks
+  if (! cell %in% names(D)) {warning('Variable "cell" required in input dataset'); stop()}
+  if (! hosp_id %in% names(D)) {warning('Variable "hosp_id" required in input dataset'); stop()}
+  if (! hospital %in% names(D)) {warning('Variable "hospital" required in input dataset'); stop()}
+  if (! sys_id %in% names(D)) {warning('Variable "sys_id" required in input dataset'); stop()}
+  if (! party_ind %in% names(D)) {warning('Variable "party_ind" required in input dataset'); stop()}
+  if (! adm %in% names(D)) {warning('Variable "adm" required in input dataset'); stop()}
 
   iter <- 0
-  D$party_sys_id <- D$party_ind*D$sys_id
+  D$party_sys_id <- D[[party_ind]]*D[[sys_id]]
   party_sys_list <- sort(unique(D$party_sys_id[D$party_sys_id > 0]))
 
   for (m in party_sys_list) {
     # Calculate cell-specific hospital diversion ratios
-    y_hosp_cell = aggregate(D$adm,by=list(D$cell,D$hosp_id,D$hospital,D$party_sys_id),sum)
+    y_hosp_cell = aggregate(D[[adm]],by=list(D[[cell]],D[[hosp_id]],D[[hospital]],D$party_sys_id),sum)
     names(y_hosp_cell) <- c("cell","hosp_id","hospital","party_sys_id","N_h")
 
     y_hosp_cell$N <- ave(y_hosp_cell$N_h,y_hosp_cell$cell, FUN = sum)
@@ -130,7 +137,7 @@ div_calc <- function(D,
       y_hosp_cell$N_h_predict[y_hosp_cell$party_sys_id == m] <- 0
 
       # Sum across cells
-      y_hosp = aggregate(D$adm,by=list(D$hosp_id,D$hospital,D$party_sys_id,D$sys_id),sum)
+      y_hosp = aggregate(D[[adm]],by=list(D[[hosp_id]],D[[hospital]],D$party_sys_id,D[[sys_id]]),sum)
       names(y_hosp) <- c("hosp_id","hospital","party_sys_id","sys_id","N_h")
 
       y_hosp$N_k <- 0
@@ -192,18 +199,18 @@ div_calc <- function(D,
 
 
   # Return List of Outputs
-  names(out)[names(out) == "cell"] <- cell
-  names(out2)[names(out2) == "cell"] <- cell
-  names(out)[names(out) == "hosp_id"] <- hosp_id
-  names(out2)[names(out2) == "hosp_id"] <- hosp_id
-  names(out)[names(out) == "hospital"] <- hospital
-  names(out2)[names(out2) == "hospital"] <- hospital
-  names(out)[names(out) == "sys_id"] <- sys_id
-  names(out2)[names(out2) == "sys_id"] <- sys_id
-  names(out)[names(out) == "party_ind"] <- party_ind
-  names(out2)[names(out2) == "party_ind"] <- party_ind
-  names(out)[names(out) == "adm"] <- adm
-  names(out2)[names(out2) == "adm"] <- adm
+  #names(out)[names(out) == "cell"] <- cell
+  #names(out2)[names(out2) == "cell"] <- cell
+  #names(out)[names(out) == "hosp_id"] <- hosp_id
+  #names(out2)[names(out2) == "hosp_id"] <- hosp_id
+  #names(out)[names(out) == "hospital"] <- hospital
+  #names(out2)[names(out2) == "hospital"] <- hospital
+  #names(out)[names(out) == "sys_id"] <- sys_id
+  #names(out2)[names(out2) == "sys_id"] <- sys_id
+  #names(out)[names(out) == "party_ind"] <- party_ind
+  #names(out2)[names(out2) == "party_ind"] <- party_ind
+  #names(out)[names(out) == "adm"] <- adm
+  #names(out2)[names(out2) == "adm"] <- adm
 
   newList <- list("hosp_level" = out, "sys_level" = out2)
   #newList <- list("hosp_level" = out)
