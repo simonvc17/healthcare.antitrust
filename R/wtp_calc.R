@@ -49,8 +49,7 @@
 
 # This function calculates the system-level WTP.
 # MAYBE add system id to the output?
-# MAYBE also make weight an optional input argument; use it only if supplied.
-
+# Also I think party_ind is not really used, remove as input?
 
 wtp_calc <- function(D,
                      cell = "cell",
@@ -60,20 +59,22 @@ wtp_calc <- function(D,
                      weight = "weight",
                      dropDegenerateCell = TRUE) {
 
-  # allow for generic variable names
-  names(D)[names(D) == cell] <- "cell"
-  names(D)[names(D) == sys_id] <- "sys_id"
-  names(D)[names(D) == party_ind] <- "party_ind"
-  names(D)[names(D) == adm] <- "adm"
+  ## allow for generic variable names. old. Now [] instead of $
+  #names(D)[names(D) == cell] <- "cell"
+  #names(D)[names(D) == sys_id] <- "sys_id"
+  #names(D)[names(D) == party_ind] <- "party_ind"
+  #names(D)[names(D) == adm] <- "adm"
 
-  # allow weight to be named or, if missing, set = 1.
-  names(D)[names(D) == weight] <- "weight"
-  if (!"weight" %in% names(D)) { D$weight  <- 1}
+  ## allow weight to be named or, if missing, set = 1.
+  ## Next two lines were old version, now using [] instead of $
+  #names(D)[names(D) == weight] <- "weight"
+  #if (!"weight" %in% names(D)) { D$weight  <- 1}
+  if (! weight %in% names(D)) { D$weight  <- 1}
 
+  #D$totalweight <- D$weight*D$adm  # in case some obs are aggregated admissions
+  D$totalweight <- D[[weight]]*D[[adm]]  # in case some obs are aggregated admissions
 
-  D$totalweight <- D$weight*D$adm  # in case some obs are aggregated admissions
-
-  y_cell <- aggregate(list(N_s=D$adm, wt = D$totalweight),by=list(cell=D$cell, sys_id=D$sys_id,party=D$party),sum)
+  y_cell <- aggregate(list(N_s=D[[adm]], wt = D$totalweight),by=list(cell=D[[cell]], sys_id=D[[sys_id]],party=D[[party_ind]]),sum)
 
   y_cell <- y_cell[order(y_cell$cell,y_cell$sys_id),]
 
@@ -98,10 +99,10 @@ wtp_calc <- function(D,
   y <- aggregate(list(WTP_s=y_cell$WTP_s, N_s=y_cell$N_s, WTP_s_wt=y_cell$WTP_s_wt),by=list(party=y_cell$party,sys_id=y_cell$sys_id),sum)
 
   # Revert variable names
-  names(y)[names(y) == "cell"] <- cell
-  names(y)[names(y) == "sys_id"] <- sys_id
-  names(y)[names(y) == "party_ind"] <- party_ind
-  names(y)[names(y) == "adm"] <- adm
+  #names(y)[names(y) == "cell"] <- cell
+  #names(y)[names(y) == "sys_id"] <- sys_id
+  #names(y)[names(y) == "party_ind"] <- party_ind
+  #names(y)[names(y) == "adm"] <- adm
 
   return(y)
 }
