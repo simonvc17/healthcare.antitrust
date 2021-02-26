@@ -49,9 +49,11 @@ cell_defn <- function(D, s_min, layers, adm = "adm") {
   if (length(s_min)!=1) {warning('Input min cell size needs to be length 1'); stop()}
   if (!is(layers,"list")) {warning('Input layers need to be a list'); stop()}
 
-  # Allow adm variable name to be missing.
-  names(D)[names(D) == adm] <- "adm"
-  if (!"adm" %in% names(D)) {message('Assuming one admission per row. Variable adm created.'); D$adm  <- 1}
+  ## Allow adm variable name to be missing.
+  #names(D)[names(D) == adm] <- "adm"
+  #if (!"adm" %in% names(D)) {message('Assuming one admission per row. Variable adm created.'); D$adm  <- 1}
+  ## above two lines were old version, now using [] instead of $
+  if (! adm %in% names(D)) {message('Assuming one admission per row. Variable adm created.'); D$adm  <- 1}
 
   cc <- c("cell","cell_type")
 
@@ -74,7 +76,7 @@ cell_defn <- function(D, s_min, layers, adm = "adm") {
 
   # First Layer
   DD <- merge(D,cell1,by=(list1))
-  tmp <- aggregate(DD$adm,by=list(DD$cell,DD$cell_type),sum)
+  tmp <- aggregate(DD[[adm]],by=list(DD$cell,DD$cell_type),sum)
   names(tmp) <- c(cc,"cell_tot")
   DD <- merge(DD,tmp,by=cc)
   D0 <- subset(DD,cell_tot >= s_min)
@@ -92,7 +94,7 @@ cell_defn <- function(D, s_min, layers, adm = "adm") {
     DD[,cbind(cc[1],cc[2],"cell_tot")] <- list(NULL)
 
     DD <- merge(DD,cellj,by=(listj))
-    tmp <- aggregate(DD$adm,by=list(DD$cell,DD$cell_type),sum)
+    tmp <- aggregate(DD[[adm]],by=list(DD$cell,DD$cell_type),sum)
     names(tmp) <- c(cc,"cell_tot")
     DD <- merge(DD,tmp,by=cc)
 
@@ -120,9 +122,11 @@ cell_defn <- function(D, s_min, layers, adm = "adm") {
 
   D0[,cbind("cell1","cell_tot")] <- list(NULL)
 
+  # old- needed before switch from $ to [ ]
+  #names(D0)[names(D0) == "adm"] <- adm
+  #names(DD)[names(DD) == "adm"] <- adm
+
   # Return List of Outputs
-  names(D0)[names(D0) == "adm"] <- adm
-  names(DD)[names(DD) == "adm"] <- adm
   newList <- list("dataset" = D0, "unassigned" = DD)
   return(newList)
 }
